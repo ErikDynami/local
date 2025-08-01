@@ -11,11 +11,11 @@
         color: #333;
         display: flex;
         height: 100vh;
-        /* 
-           BYT UT DENNA SÖKVÄG: 
-           Lägg sökvägen till din orangea gradientbild här. 
+        /*
+           Här skapas den orangea faden (gradienten) direkt med CSS.
+           Den går från en ljusare orange (#ffaf4b) till en mörkare (#ff8c00).
         */
-        background-image: url('path/till/din/gradient-bakgrund.jpg');
+        background: linear-gradient(to bottom, #ffaf4b, #ff8c00);
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -24,7 +24,7 @@
     .container {
         display: flex;
         width: 100%;
-        background-color: rgba(255, 255, 255, 0.85); /* Lätt genomskinlig vit bakgrund för läsbarhet */
+        background-color: rgba(255, 255, 255, 0.9); /* Något mindre genomskinlig för bättre läsbarhet */
         margin: 20px;
         border-radius: 15px;
         overflow: hidden;
@@ -45,8 +45,7 @@
         color: white;
         display: flex;
         flex-direction: column;
-        /* Använder en mörkare ton från er grafiska profil för texten för bättre kontrast mot den ljusa bakgrunden */
-        color: #333;
+        color: #333; /* Svart text för kontrast */
     }
 
     h1, h2 {
@@ -55,16 +54,14 @@
 
     h1 {
         font-size: 24px;
-        /* Färg från er grafiska profil */
-        color: #e65100;
+        color: #e65100; /* Färg från er grafiska profil */
         margin-bottom: 30px;
     }
 
     h2 {
         font-size: 18px;
         color: #333;
-        /* Färg från er grafiska profil */
-        border-bottom: 2px solid #ff8c00;
+        border-bottom: 2px solid #ff8c00; /* Färg från er grafiska profil */
         padding-bottom: 10px;
         margin-top: 0;
     }
@@ -93,8 +90,7 @@
         top: 0;
         width: 20px;
         height: 20px;
-        /* Färg från er grafiska profil */
-        border: 2px solid #ff8c00;
+        border: 2px solid #ff8c00; /* Färg från er grafiska profil */
         border-radius: 3px;
         background-color: #fff;
     }
@@ -106,8 +102,7 @@
         top: 3px;
         width: 6px;
         height: 12px;
-        /* Färg från er grafiska profil */
-        border: solid #e65100;
+        border: solid #e65100; /* Färg från er grafiska profil */
         border-width: 0 3px 3px 0;
         transform: rotate(45deg);
     }
@@ -166,11 +161,8 @@
         <div id="clock"></div>
         <div id="date"></div>
         <div class="logo-container">
-            <!-- 
-                BYT UT DENNA SÖKVÄG: 
-                Lägg sökvägen till er 10-årslogotyp här. 
-            -->
-            <img src="path/till/din/10ar-logga.png" alt="Dynami 10 år Logotyp">
+            <!-- Sökvägen till er logotyp är nu inlagd här -->
+            <img src="Dynami_10a╠èr_OK.jpg" alt="Dynami 10 år Logotyp">
         </div>
     </div>
 </div>
@@ -184,7 +176,6 @@
         document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        /* Ändrat till svensk tidsvisning */
         document.getElementById('date').textContent = now.toLocaleDateString('sv-SE', options);
     }
 
