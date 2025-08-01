@@ -1,26 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dynami Dashboard</title>
+<title>Dynami Instrumentpanel</title>
 <style>
     body {
         font-family: 'Helvetica Neue', Arial, sans-serif;
         margin: 0;
-        background-color: #f4f4f4;
         color: #333;
         display: flex;
         height: 100vh;
+        /* 
+           BYT UT DENNA SÖKVÄG: 
+           Lägg sökvägen till din orangea gradientbild här. 
+        */
+        background-image: url('path/till/din/gradient-bakgrund.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 
     .container {
         display: flex;
         width: 100%;
+        background-color: rgba(255, 255, 255, 0.85); /* Lätt genomskinlig vit bakgrund för läsbarhet */
+        margin: 20px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
 
     .left-panel {
-        background-color: #fff;
+        background-color: #ffffff;
         padding: 40px;
         width: 35%;
         box-shadow: 2px 0 5px rgba(0,0,0,0.1);
@@ -30,10 +42,11 @@
     .right-panel {
         padding: 40px;
         width: 65%;
-        background-color: #ff8c00;
         color: white;
         display: flex;
         flex-direction: column;
+        /* Använder en mörkare ton från er grafiska profil för texten för bättre kontrast mot den ljusa bakgrunden */
+        color: #333;
     }
 
     h1, h2 {
@@ -42,6 +55,7 @@
 
     h1 {
         font-size: 24px;
+        /* Färg från er grafiska profil */
         color: #e65100;
         margin-bottom: 30px;
     }
@@ -49,6 +63,7 @@
     h2 {
         font-size: 18px;
         color: #333;
+        /* Färg från er grafiska profil */
         border-bottom: 2px solid #ff8c00;
         padding-bottom: 10px;
         margin-top: 0;
@@ -78,6 +93,7 @@
         top: 0;
         width: 20px;
         height: 20px;
+        /* Färg från er grafiska profil */
         border: 2px solid #ff8c00;
         border-radius: 3px;
         background-color: #fff;
@@ -90,6 +106,7 @@
         top: 3px;
         width: 6px;
         height: 12px;
+        /* Färg från er grafiska profil */
         border: solid #e65100;
         border-width: 0 3px 3px 0;
         transform: rotate(45deg);
@@ -108,19 +125,17 @@
         margin-bottom: 40px;
     }
 
-    .free-cam-container {
+    .logo-container {
         flex-grow: 1;
-        background-color: rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        padding: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    .free-cam-text {
-        font-size: 28px;
-        font-weight: bold;
+    .logo-container img {
+        max-width: 80%;
+        max-height: 250px;
+        height: auto;
     }
 
 </style>
@@ -129,29 +144,33 @@
 
 <div class="container">
     <div class="left-panel">
-        <h1>Checklist</h1>
+        <h1>Checklista</h1>
         <div class="checklist-item">
             <input type="checkbox" id="task1">
-            <label for="task1">Complete project proposal</label>
+            <label for="task1">Slutför projektförslag</label>
         </div>
         <div class="checklist-item">
             <input type="checkbox" id="task2">
-            <label for="task2">Send follow-up emails</label>
+            <label for="task2">Skicka uppföljningsmejl</label>
         </div>
         <div class="checklist-item">
             <input type="checkbox" id="task3">
-            <label for="task3">Prepare for team meeting</label>
+            <label for="task3">Förbered för teammöte</label>
         </div>
         <div class="checklist-item">
             <input type="checkbox" id="task4">
-            <label for="task4">Review monthly budget</label>
+            <label for="task4">Granska månadsbudget</label>
         </div>
     </div>
     <div class="right-panel">
         <div id="clock"></div>
         <div id="date"></div>
-        <div class="free-cam-container">
-            <div class="free-cam-text">Free Cam</div>
+        <div class="logo-container">
+            <!-- 
+                BYT UT DENNA SÖKVÄG: 
+                Lägg sökvägen till er 10-årslogotyp här. 
+            -->
+            <img src="path/till/din/10ar-logga.png" alt="Dynami 10 år Logotyp">
         </div>
     </div>
 </div>
@@ -165,7 +184,8 @@
         document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('date').textContent = now.toLocaleDateString('en-US', options);
+        /* Ändrat till svensk tidsvisning */
+        document.getElementById('date').textContent = now.toLocaleDateString('sv-SE', options);
     }
 
     setInterval(updateTime, 1000);
