@@ -11,10 +11,6 @@
         color: #333;
         display: flex;
         height: 100vh;
-        /*
-           Här skapas den orangea faden (gradienten) direkt med CSS.
-           Den går från en ljusare orange (#ffaf4b) till en mörkare (#ff8c00).
-        */
         background: linear-gradient(to bottom, #ffaf4b, #ff8c00);
         background-size: cover;
         background-position: center;
@@ -24,7 +20,7 @@
     .container {
         display: flex;
         width: 100%;
-        background-color: rgba(255, 255, 255, 0.9); /* Något mindre genomskinlig för bättre läsbarhet */
+        background-color: rgba(255, 255, 255, 0.9);
         margin: 20px;
         border-radius: 15px;
         overflow: hidden;
@@ -34,40 +30,31 @@
     .left-panel {
         background-color: #ffffff;
         padding: 40px;
-        width: 35%;
+        width: 40%; /* Något bredare för att rymma större text */
         box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         border-right: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Centrerar innehållet vertikalt */
     }
 
     .right-panel {
         padding: 40px;
-        width: 65%;
-        color: white;
+        width: 60%;
         display: flex;
         flex-direction: column;
-        color: #333; /* Svart text för kontrast */
-    }
-
-    h1, h2 {
-        font-weight: bold;
+        color: #333;
     }
 
     h1 {
-        font-size: 24px;
-        color: #e65100; /* Färg från er grafiska profil */
-        margin-bottom: 30px;
-    }
-
-    h2 {
-        font-size: 18px;
-        color: #333;
-        border-bottom: 2px solid #ff8c00; /* Färg från er grafiska profil */
-        padding-bottom: 10px;
-        margin-top: 0;
+        font-size: 48px; /* Mycket större */
+        color: #e65100;
+        margin-bottom: 40px;
+        text-align: center;
     }
 
     .checklist-item {
-        margin-bottom: 15px;
+        margin-bottom: 25px; /* Mer utrymme mellan punkterna */
         display: flex;
         align-items: center;
     }
@@ -78,9 +65,9 @@
 
     .checklist-item label {
         position: relative;
-        padding-left: 35px;
+        padding-left: 45px; /* Justerat för större box */
         cursor: pointer;
-        font-size: 16px;
+        font-size: 22px; /* Större text */
     }
 
     .checklist-item label:before {
@@ -88,49 +75,51 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #ff8c00; /* Färg från er grafiska profil */
-        border-radius: 3px;
+        width: 28px; /* Större checkbox */
+        height: 28px;
+        border: 3px solid #ff8c00;
+        border-radius: 5px;
         background-color: #fff;
     }
 
     .checklist-item input[type="checkbox"]:checked + label:after {
         content: '';
         position: absolute;
-        left: 7px;
-        top: 3px;
-        width: 6px;
-        height: 12px;
-        border: solid #e65100; /* Färg från er grafiska profil */
-        border-width: 0 3px 3px 0;
+        left: 10px; /* Justerat för större box */
+        top: 5px;   /* Justerat för större box */
+        width: 8px;
+        height: 16px;
+        border: solid #e65100;
+        border-width: 0 4px 4px 0;
         transform: rotate(45deg);
     }
 
     #clock {
-        font-size: 48px;
+        font-size: 84px; /* Mycket större klocka */
         font-weight: bold;
         text-align: center;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
 
     #date {
-        font-size: 24px;
+        font-size: 32px; /* Större datum */
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
     }
 
     .logo-container {
-        flex-grow: 1;
+        flex-grow: 1; /* Gör att denna container fyller resten av utrymmet */
         display: flex;
         align-items: center;
         justify-content: center;
+        min-height: 0; /* Viktigt för flexbox i vissa webbläsare */
     }
 
     .logo-container img {
-        max-width: 80%;
-        max-height: 250px;
-        height: auto;
+        /* Fyller ut containern så mycket som möjligt utan att förvrängas */
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; /* Ser till att hela bilden syns */
     }
 
 </style>
@@ -139,29 +128,30 @@
 
 <div class="container">
     <div class="left-panel">
-        <h1>Checklista</h1>
-        <div class="checklist-item">
-            <input type="checkbox" id="task1">
-            <label for="task1">Slutför projektförslag</label>
-        </div>
-        <div class="checklist-item">
-            <input type="checkbox" id="task2">
-            <label for="task2">Skicka uppföljningsmejl</label>
-        </div>
-        <div class="checklist-item">
-            <input type="checkbox" id="task3">
-            <label for="task3">Förbered för teammöte</label>
-        </div>
-        <div class="checklist-item">
-            <input type="checkbox" id="task4">
-            <label for="task4">Granska månadsbudget</label>
+        <div>
+            <h1>Checklista</h1>
+            <div class="checklist-item">
+                <input type="checkbox" id="task1">
+                <label for="task1">Slutför projektförslag</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="task2">
+                <label for="task2">Skicka uppföljningsmejl</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="task3">
+                <label for="task3">Förbered för teammöte</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="task4">
+                <label for="task4">Granska månadsbudget</label>
+            </div>
         </div>
     </div>
     <div class="right-panel">
         <div id="clock"></div>
         <div id="date"></div>
         <div class="logo-container">
-            <!-- Sökvägen till er logotyp är nu inlagd här -->
             <img src="Dynami_10a╠èr_OK.jpg" alt="Dynami 10 år Logotyp">
         </div>
     </div>
