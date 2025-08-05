@@ -131,6 +131,33 @@
         object-fit: contain;
     }
 
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+        .container {
+            margin: 0;
+            border-radius: 0;
+            flex-direction: column; /* Stack panels vertically */
+        }
+
+        .right-panel {
+            display: none; /* Hide the right panel */
+        }
+
+        .left-panel {
+            width: 100%; /* Make the left panel take full width */
+            border-right: none;
+            padding: 20px; /* Adjust padding for smaller screens */
+        }
+
+        h1 {
+            font-size: 36px; /* Adjust font size for mobile */
+        }
+
+        .checklist-item label {
+            font-size: 18px; /* Adjust font size for mobile */
+        }
+    }
+
 </style>
 </head>
 <body>
@@ -226,6 +253,9 @@
      * Adjusts the font size of the checklist items to fit within the container.
      */
     function adjustFontSize() {
+        // We only run this on non-mobile views
+        if (window.innerWidth <= 768) return;
+
         // Disable overflow-y to check if content overflows
         listContainer.style.overflowY = 'hidden';
         const labels = listContainer.querySelectorAll('.checklist-item label');
