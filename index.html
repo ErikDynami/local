@@ -30,19 +30,18 @@
     .left-panel {
         background-color: #ffffff;
         padding: 40px;
-        width: 40%;
+        width: 35%; /* Updated width */
         box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         border-right: 1px solid #ddd;
         display: flex;
         flex-direction: column;
-        /* Key change for scrolling layout */
         max-height: 100%;
         box-sizing: border-box;
     }
 
     .right-panel {
         padding: 40px;
-        width: 60%;
+        width: 65%; /* Adjusted width */
         display: flex;
         flex-direction: column;
         color: #333;
@@ -51,19 +50,17 @@
     h1 {
         font-size: 48px;
         color: #e65100;
-        margin-top: 0; /* Removed top margin */
-        margin-bottom: 20px; /* Reduced bottom margin */
+        margin-top: 0;
+        margin-bottom: 20px;
         text-align: center;
-        /* Key change for scrolling layout */
-        flex-shrink: 0; /* Prevents the header from shrinking */
+        flex-shrink: 0;
     }
 
-    /* NEW: Container for the scrollable list */
     #service-list-container {
-        flex-grow: 1; /* Allows this div to take up remaining space */
-        overflow-y: auto; /* Adds a scrollbar ONLY if content overflows */
-        min-height: 0; /* Flexbox bug fix */
-        padding-right: 15px; /* Space for the scrollbar */
+        flex-grow: 1;
+        overflow-y: auto;
+        min-height: 0;
+        padding-right: 15px;
     }
 
     .checklist-item {
@@ -80,7 +77,7 @@
         position: relative;
         padding-left: 45px;
         cursor: pointer;
-        font-size: 22px;
+        font-size: 22px; /* Initial font size */
     }
 
     .checklist-item label:before {
@@ -141,9 +138,8 @@
 <div class="container">
     <div class="left-panel">
         <h1>Servicelista</h1>
-        <!-- This div will be populated dynamically by Firebase -->
         <div id="service-list-container">
-            <!-- Example: <div class="checklist-item">...</div> will be inserted here -->
+            <!-- Dynamically populated -->
         </div>
     </div>
     <div class="right-panel">
@@ -155,12 +151,10 @@
     </div>
 </div>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
 <script>
-    // --- CLOCK AND DATE SCRIPT (No changes needed) ---
     function updateTime() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -174,34 +168,25 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    // --- FIREBASE INTEGRATION SCRIPT ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrkXax4XtQdC_kGIVN1OgleLKIunOrIcM",
+      authDomain: "erikdynami.firebaseapp.com",
+      projectId: "erikdynami",
+      storageBucket: "erikdynami.firebasestorage.app",
+      messagingSenderId: "1014648797947",
+      appId: "1:1014648797947:web:323c4dc9bc3ad6ef288e5e"
+    };
 
-    // 1. PASTE YOUR FIREBASE CONFIGURATION OBJECT HERE
-const firebaseConfig = {
-  apiKey: "AIzaSyDrkXax4XtQdC_kGIVN1OgleLKIunOrIcM",
-  authDomain: "erikdynami.firebaseapp.com",
-  projectId: "erikdynami",
-  storageBucket: "erikdynami.firebasestorage.app",
-  messagingSenderId: "1014648797947",
-  appId: "1:1014648797947:web:323c4dc9bc3ad6ef288e5e"
-};
-
-    // 2. Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
     const tasksRef = database.ref('tasks');
-
-    // 3. Get the container for the list
     const listContainer = document.getElementById('service-list-container');
 
-    // 4. Listen for data changes in real-time
     tasksRef.on('value', (snapshot) => {
         const tasks = snapshot.val();
-        // Clear the current list to prevent duplicates
         listContainer.innerHTML = ''; 
 
         if (tasks) {
-            // Loop through each task from the database
             Object.keys(tasks).forEach(key => {
                 const taskData = tasks[key];
                 createTaskElement(key, taskData);
@@ -209,26 +194,24 @@ const firebaseConfig = {
         } else {
             listContainer.innerHTML = '<p>Inga uppgifter att visa.</p>';
         }
+        adjustFontSize(); // Adjust font size after list is populated
     });
 
-    // Function to create and add a single task item to the DOM
     function createTaskElement(key, taskData) {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'checklist-item';
         
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.id = key; // Use the unique Firebase key as the ID
+        checkbox.id = key;
         checkbox.checked = taskData.completed;
 
         const label = document.createElement('label');
         label.htmlFor = key;
         label.textContent = taskData.text;
 
-        // Add an event listener to update Firebase when the checkbox is clicked
         checkbox.addEventListener('change', (event) => {
             const isChecked = event.target.checked;
-            // Update the 'completed' status in the database for this specific task
             database.ref('tasks/' + key).update({
                 completed: isChecked
             });
@@ -237,6 +220,29 @@ const firebaseConfig = {
         itemDiv.appendChild(checkbox);
         itemDiv.appendChild(label);
         listContainer.appendChild(itemDiv);
+    }
+
+    /**
+     * Adjusts the font size of the checklist items to fit within the container.
+     */
+    function adjustFontSize() {
+        // Disable overflow-y to check if content overflows
+        listContainer.style.overflowY = 'hidden';
+        const labels = listContainer.querySelectorAll('.checklist-item label');
+        if (labels.length === 0) return;
+
+        let currentFontSize = parseFloat(window.getComputedStyle(labels[0]).fontSize);
+        const minFontSize = 10; // Minimum font size
+
+        // Reduce font size until content fits
+        while (listContainer.scrollHeight > listContainer.clientHeight && currentFontSize > minFontSize) {
+            currentFontSize--;
+            labels.forEach(label => {
+                label.style.fontSize = `${currentFontSize}px`;
+            });
+        }
+        // Restore overflow-y
+        listContainer.style.overflowY = 'auto';
     }
 </script>
 
