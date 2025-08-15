@@ -30,7 +30,7 @@
     .left-panel {
         background-color: #ffffff;
         padding: 40px;
-        width: 50%;
+        width: 60%; /* CHANGED: Made wider */
         box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         border-right: 1px solid #ddd;
         display: flex;
@@ -41,7 +41,7 @@
 
     .right-panel {
         padding: 40px;
-        width: 50%;
+        width: 40%; /* CHANGED: Made narrower */
         display: flex;
         flex-direction: column;
         color: #333;
@@ -77,7 +77,7 @@
         position: relative;
         padding-left: 45px;
         cursor: pointer;
-        font-size: 22px;
+        font-size: 20px; /* CHANGED: Made smaller */
     }
 
     .checklist-item label:before {
@@ -253,21 +253,35 @@
         listContainer.appendChild(itemDiv);
     }
 
+    // --- FUNCTION UPDATED ---
     function adjustFontSize() {
+        // Don't run this logic on small screens (mobile)
         if (window.innerWidth <= 768) return;
-        listContainer.style.overflowY = 'hidden';
+
         const labels = listContainer.querySelectorAll('.checklist-item label');
         if (labels.length === 0) return;
+
+        // Reset font size to default from stylesheet before calculating.
+        // This allows font to grow back if items are removed.
+        labels.forEach(label => {
+            label.style.fontSize = '';
+        });
+
+        // Hide scrollbar for accurate measurement
+        listContainer.style.overflowY = 'hidden';
 
         let currentFontSize = parseFloat(window.getComputedStyle(labels[0]).fontSize);
         const minFontSize = 10;
 
+        // Shrink font size if content is taller than the container
         while (listContainer.scrollHeight > listContainer.clientHeight && currentFontSize > minFontSize) {
             currentFontSize--;
             labels.forEach(label => {
                 label.style.fontSize = `${currentFontSize}px`;
             });
         }
+
+        // Re-enable scrollbar in case shrinking was not enough or for other reasons.
         listContainer.style.overflowY = 'auto';
     }
 </script>
