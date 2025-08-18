@@ -10,7 +10,7 @@
         margin: 0;
         color: #333;
         display: flex;
-        min-height: 100vh; /* ✅ allow taller content */
+        min-height: 100vh;
         background: linear-gradient(to bottom, #ffaf4b, #ff8c00);
         background-size: cover;
         background-position: center;
@@ -131,71 +131,38 @@
         object-fit: contain;
     }
 
-    /* Mobile-specific styles */
     @media (max-width: 768px) {
-        body {
-            display: block; /* allow natural page flow */
-        }
+        body { display: block; }
         .container {
             margin: 0;
             border-radius: 0;
-            flex-direction: column; /* stack panels vertically */
-            height: auto; /* allow container to expand */
+            flex-direction: column;
+            height: auto;
         }
-        .right-panel {
-            display: none; /* hide right panel */
-        }
+        .right-panel { display: none; }
         .left-panel {
             width: 100%;
             border-right: none;
             padding: 20px;
-            max-height: none; /* remove height limit */
+            max-height: none;
         }
         #service-list-container {
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* smooth scroll for iOS */
+            -webkit-overflow-scrolling: touch;
         }
-        h1 {
-            font-size: 36px;
-        }
-        .checklist-item label {
-            font-size: 18px;
-        }
+        h1 { font-size: 36px; }
+        .checklist-item label { font-size: 18px; }
     }
 
-    /* ✅ TV / Large screen styles */
     @media (min-width: 1800px) {
-        h1 {
-            font-size: 64px;
-        }
-        #service-list-container {
-            padding-right: 25px; /* More space for scrollbar if needed */
-        }
-        .checklist-item {
-            margin-bottom: 30px;
-        }
-        .checklist-item label {
-            font-size: 28px; /* Larger text for list items */
-            padding-left: 55px; /* More space for bigger checkbox */
-        }
-        .checklist-item label:before {
-            width: 36px; /* Bigger checkbox */
-            height: 36px;
-            border-width: 4px;
-        }
-        .checklist-item input[type="checkbox"]:checked + label:after {
-            left: 13px; /* Reposition checkmark */
-            top: 7px;
-            width: 10px; /* Bigger checkmark */
-            height: 20px;
-            border-width: 0 5px 5px 0;
-        }
-        #clock {
-            font-size: 120px; /* Larger clock */
-        }
-        #date {
-            font-size: 48px; /* Larger date */
-        }
+        h1 { font-size: 64px; }
+        #service-list-container { padding-right: 25px; }
+        .checklist-item { margin-bottom: 30px; }
+        .checklist-item label { font-size: 28px; padding-left: 55px; }
+        .checklist-item label:before { width: 36px; height: 36px; border-width: 4px; }
+        .checklist-item input[type="checkbox"]:checked + label:after { left: 13px; top: 7px; width: 10px; height: 20px; border-width: 0 5px 5px 0; }
+        #clock { font-size: 120px; }
+        #date { font-size: 48px; }
     }
 </style>
 </head>
@@ -204,9 +171,7 @@
 <div class="container">
     <div class="left-panel">
         <h1>Servicelista</h1>
-        <div id="service-list-container">
-            <!-- Dynamically populated -->
-        </div>
+        <div id="service-list-container"></div>
     </div>
     <div class="right-panel">
         <div id="clock"></div>
@@ -221,137 +186,109 @@
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
 <script>
-    function updateTime() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+function updateTime() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
 
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('date').textContent = now.toLocaleDateString('sv-SE', options);
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('date').textContent = now.toLocaleDateString('sv-SE', options);
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDrkXax4XtQdC_kGIVN1OgleLKIunOrIcM",
+  authDomain: "erikdynami.firebaseapp.com",
+  projectId: "erikdynami",
+  storageBucket: "erikdynami.firebasestorage.app",
+  messagingSenderId: "1014648797947",
+  appId: "1:1014648797947:web:323c4dc9bc3ad6ef288e5e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+const tasksRef = database.ref('tasks');
+const listContainer = document.getElementById('service-list-container');
+
+tasksRef.on('value', (snapshot) => {
+    const tasks = snapshot.val();
+    listContainer.innerHTML = ''; 
+
+    if (tasks) {
+        Object.keys(tasks).forEach(key => {
+            const taskData = tasks[key];
+            createTaskElement(key, taskData);
+        });
+    } else {
+        listContainer.innerHTML = '<p>Inga uppgifter att visa.</p>';
     }
-    setInterval(updateTime, 1000);
-    updateTime();
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDrkXax4XtQdC_kGIVN1OgleLKIunOrIcM",
-      authDomain: "erikdynami.firebaseapp.com",
-      projectId: "erikdynami",
-      storageBucket: "erikdynami.firebasestorage.app",
-      messagingSenderId: "1014648797947",
-      appId: "1:1014648797947:web:323c4dc9bc3ad6ef288e5e"
-    };
+    setTimeout(adjustFontSize, 0);
+});
 
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    const tasksRef = database.ref('tasks');
-    const listContainer = document.getElementById('service-list-container');
+function createTaskElement(key, taskData) {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'checklist-item';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = key;
+    checkbox.checked = taskData.completed;
 
-    tasksRef.on('value', (snapshot) => {
-        const tasks = snapshot.val();
-        listContainer.innerHTML = ''; 
+    const label = document.createElement('label');
+    label.htmlFor = key;
+    // ✅ Omvandla \n från Firebase till riktiga rader i HTML
+    label.innerHTML = taskData.text.replace(/\\n/g, '<br>');
 
-        if (tasks) {
-            Object.keys(tasks).forEach(key => {
-                const taskData = tasks[key];
-                createTaskElement(key, taskData);
-            });
+    checkbox.addEventListener('change', (event) => {
+        const isNowChecked = event.target.checked;
+        let confirmationMessage;
+
+        if (isNowChecked) {
+            confirmationMessage = `Är du säker på att du vill markera "${taskData.text}" som klar?`;
         } else {
-            listContainer.innerHTML = '<p>Inga uppgifter att visa.</p>';
+            confirmationMessage = `Är du säker på att du vill avmarkera "${taskData.text}"?`;
         }
-        // Run adjustFontSize after a tiny delay to ensure browser has rendered new styles
-        setTimeout(adjustFontSize, 0);
+
+        if (confirm(confirmationMessage)) {
+            database.ref('tasks/' + key).update({ completed: isNowChecked });
+        } else {
+            event.target.checked = !isNowChecked; 
+        }
     });
 
-    // ===============================================
-    // ========= START PÅ KORRIGERAD KOD =============
-    // ===============================================
-    function createTaskElement(key, taskData) {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'checklist-item';
-        
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = key;
-        checkbox.checked = taskData.completed;
+    itemDiv.appendChild(checkbox);
+    itemDiv.appendChild(label);
+    listContainer.appendChild(itemDiv);
+}
 
-        const label = document.createElement('label');
-        label.htmlFor = key;
-        label.textContent = taskData.text;
+function adjustFontSize() {
+    if (window.innerWidth <= 768) return;
 
-        // Vi använder 'change'-eventet som är mer logiskt här.
-        // Det körs EFTER att rutan har kryssats i eller ur.
-        checkbox.addEventListener('change', (event) => {
-            const isNowChecked = event.target.checked; // Detta är det nya läget (true eller false)
-            
-            let confirmationMessage;
+    const labels = listContainer.querySelectorAll('.checklist-item label');
+    if (labels.length === 0) return;
 
-            if (isNowChecked) {
-                // Rutan har precis blivit ikryssad, så vi frågar om det var meningen.
-                confirmationMessage = `Är du säker på att du vill markera "${taskData.text}" som klar?`;
-            } else {
-                // Rutan har precis blivit avkryssad.
-                confirmationMessage = `Är du säker på att du vill avmarkera "${taskData.text}"?`;
-            }
+    labels.forEach(label => { label.style.fontSize = ''; });
+    let minFontSize = 100;
+    labels.forEach(label => {
+        const style = window.getComputedStyle(label, null).getPropertyValue('font-size');
+        const fontSize = parseFloat(style);
+        if (fontSize < minFontSize) minFontSize = fontSize;
+    });
 
-            // Visa bekräftelserutan.
-            if (confirm(confirmationMessage)) {
-                // Användaren klickade "OK".
-                // Rutan har redan rätt status, så vi behöver bara uppdatera databasen.
-                database.ref('tasks/' + key).update({
-                    completed: isNowChecked
-                });
-            } else {
-                // Användaren klickade "Avbryt".
-                // Då återställer vi checkboxen till sitt FÖREGÅENDE läge.
-                event.target.checked = !isNowChecked; 
-            }
-        });
-
-        itemDiv.appendChild(checkbox);
-        itemDiv.appendChild(label);
-        listContainer.appendChild(itemDiv);
-    }
-    // ===============================================
-    // ========= SLUT PÅ KORRIGERAD KOD  =============
-    // ===============================================
-    
-    function adjustFontSize() {
-        // Don't run this logic on small screens (mobile)
-        if (window.innerWidth <= 768) return;
-
-        const labels = listContainer.querySelectorAll('.checklist-item label');
-        if (labels.length === 0) return;
-
-        // Reset font size to default from stylesheet before calculating.
-        // This allows font to grow back if items are removed.
-        labels.forEach(label => {
-            label.style.fontSize = '';
-        });
-
-        // Hide scrollbar for accurate measurement
-        listContainer.style.overflowY = 'hidden';
-
-        // Use requestAnimationFrame to ensure the browser has applied the reset styles
-        requestAnimationFrame(() => {
-            let currentFontSize = parseFloat(window.getComputedStyle(labels[0]).fontSize);
-            const minFontSize = 10;
-            
-            // Shrink font size if content is taller than the container
-            while (listContainer.scrollHeight > listContainer.clientHeight && currentFontSize > minFontSize) {
-                currentFontSize--;
-                labels.forEach(label => {
-                    label.style.fontSize = `${currentFontSize}px`;
-                });
-            }
-
-            // Re-enable scrollbar in case shrinking was not enough or for other reasons.
-            listContainer.style.overflowY = 'auto';
-        });
-    }
+    const maxHeight = listContainer.clientHeight / labels.length;
+    labels.forEach(label => {
+        let fontSize = minFontSize;
+        while (label.scrollHeight > maxHeight && fontSize > 10) {
+            fontSize -= 1;
+            label.style.fontSize = fontSize + 'px';
+        }
+    });
+}
+window.addEventListener('resize', adjustFontSize);
 </script>
-<br><br><br><br><br><br>
-    
 </body>
 </html>
