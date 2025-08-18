@@ -264,6 +264,9 @@
         setTimeout(adjustFontSize, 0);
     });
 
+    // ===============================================
+    // ========= START PÅ KORRIGERAD KOD =============
+    // ===============================================
     function createTaskElement(key, taskData) {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'checklist-item';
@@ -277,17 +280,42 @@
         label.htmlFor = key;
         label.textContent = taskData.text;
 
+        // Vi använder 'change'-eventet som är mer logiskt här.
+        // Det körs EFTER att rutan har kryssats i eller ur.
         checkbox.addEventListener('change', (event) => {
-            const isChecked = event.target.checked;
-            database.ref('tasks/' + key).update({
-                completed: isChecked
-            });
+            const isNowChecked = event.target.checked; // Detta är det nya läget (true eller false)
+            
+            let confirmationMessage;
+
+            if (isNowChecked) {
+                // Rutan har precis blivit ikryssad, så vi frågar om det var meningen.
+                confirmationMessage = `Är du säker på att du vill markera "${taskData.text}" som klar?`;
+            } else {
+                // Rutan har precis blivit avkryssad.
+                confirmationMessage = `Är du säker på att du vill avmarkera "${taskData.text}"?`;
+            }
+
+            // Visa bekräftelserutan.
+            if (confirm(confirmationMessage)) {
+                // Användaren klickade "OK".
+                // Rutan har redan rätt status, så vi behöver bara uppdatera databasen.
+                database.ref('tasks/' + key).update({
+                    completed: isNowChecked
+                });
+            } else {
+                // Användaren klickade "Avbryt".
+                // Då återställer vi checkboxen till sitt FÖREGÅENDE läge.
+                event.target.checked = !isNowChecked; 
+            }
         });
 
         itemDiv.appendChild(checkbox);
         itemDiv.appendChild(label);
         listContainer.appendChild(itemDiv);
     }
+    // ===============================================
+    // ========= SLUT PÅ KORRIGERAD KOD  =============
+    // ===============================================
     
     function adjustFontSize() {
         // Don't run this logic on small screens (mobile)
