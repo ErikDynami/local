@@ -68,6 +68,15 @@
         overflow-y: auto;
         min-height: 0;
         padding-right: 15px;
+
+        /* iPhone safe bottom padding */
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+
+    @supports (padding: max(0px)) {
+        #service-list-container {
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+        }
     }
 
     .checklist-item {
@@ -219,7 +228,7 @@ const database = firebase.database();
 const tasksRef = database.ref('tasks');
 const listContainer = document.getElementById('service-list-container');
 
-// 🔧 Updated section that groups "bypassdiod" items under a subheading
+// 🔧 Group "bypassdiod" items under subheading
 tasksRef.on('value', (snapshot) => {
     const tasks = snapshot.val();
     listContainer.innerHTML = '';
@@ -237,10 +246,10 @@ tasksRef.on('value', (snapshot) => {
             }
         });
 
-        // Render normal tasks first
+        // Render normal tasks
         normalTasks.forEach(({ key, data }) => createTaskElement(key, data));
 
-        // Add subheading and bypassdiod tasks
+        // Subheading and bypassdiod tasks
         if (bypassTasks.length > 0) {
             const subheading = document.createElement('h2');
             subheading.textContent = 'Bypassdioder';
