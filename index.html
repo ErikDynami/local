@@ -56,6 +56,13 @@
         flex-shrink: 0;
     }
 
+    h2 {
+        font-size: 28px;
+        color: #e65100;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+
     #service-list-container {
         flex-grow: 1;
         overflow-y: auto;
@@ -166,8 +173,7 @@
     }
 </style>
 </head>
-<body>
-
+<body>  
 <div class="container">
     <div class="left-panel">
         <h1>Servicelista</h1>
@@ -213,15 +219,36 @@ const database = firebase.database();
 const tasksRef = database.ref('tasks');
 const listContainer = document.getElementById('service-list-container');
 
+// 🔧 Updated section that groups "bypassdiod" items under a subheading
 tasksRef.on('value', (snapshot) => {
     const tasks = snapshot.val();
-    listContainer.innerHTML = ''; 
+    listContainer.innerHTML = '';
 
     if (tasks) {
+        const bypassTasks = [];
+        const normalTasks = [];
+
         Object.keys(tasks).forEach(key => {
             const taskData = tasks[key];
-            createTaskElement(key, taskData);
+            if (taskData.text && taskData.text.toLowerCase().includes('bypassdiod')) {
+                bypassTasks.push({ key, data: taskData });
+            } else {
+                normalTasks.push({ key, data: taskData });
+            }
         });
+
+        // Render normal tasks first
+        normalTasks.forEach(({ key, data }) => createTaskElement(key, data));
+
+        // Add subheading and bypassdiod tasks
+        if (bypassTasks.length > 0) {
+            const subheading = document.createElement('h2');
+            subheading.textContent = 'Bypassdioder';
+            listContainer.appendChild(subheading);
+
+            bypassTasks.forEach(({ key, data }) => createTaskElement(key, data));
+        }
+
     } else {
         listContainer.innerHTML = '<p>Inga uppgifter att visa.</p>';
     }
@@ -240,7 +267,6 @@ function createTaskElement(key, taskData) {
 
     const label = document.createElement('label');
     label.htmlFor = key;
-    // ✅ Omvandla \n från Firebase till riktiga rader i HTML
     label.innerHTML = taskData.text.replace(/\\n/g, '<br>');
 
     checkbox.addEventListener('change', (event) => {
@@ -290,6 +316,5 @@ function adjustFontSize() {
 }
 window.addEventListener('resize', adjustFontSize);
 </script>
-    <br><br><br><br><br>
 </body>
 </html>
