@@ -228,33 +228,55 @@ const database = firebase.database();
 const tasksRef = database.ref('tasks');
 const listContainer = document.getElementById('service-list-container');
 
-// 🔧 Group "bypassdiod" items under subheading
 tasksRef.on('value', (snapshot) => {
     const tasks = snapshot.val();
     listContainer.innerHTML = '';
 
     if (tasks) {
+        // Skapa listor för varje kategori
+        const prioTasks = [];
         const bypassTasks = [];
         const normalTasks = [];
 
+        // Sortera uppgifterna i rätt lista
         Object.keys(tasks).forEach(key => {
             const taskData = tasks[key];
-            if (taskData.text && taskData.text.toLowerCase().includes('bypassdiod')) {
-                bypassTasks.push({ key, data: taskData });
-            } else {
-                normalTasks.push({ key, data: taskData });
+            if (taskData.text) { // Säkerställer att texten finns
+                const lowerCaseText = taskData.text.toLowerCase();
+                
+                if (lowerCaseText.includes('prio')) {
+                    prioTasks.push({ key, data: taskData });
+                } else if (lowerCaseText.includes('bypassdiod')) {
+                    bypassTasks.push({ key, data: taskData });
+                } else {
+                    normalTasks.push({ key, data: taskData });
+                }
             }
         });
 
-        // Render normal tasks
-        normalTasks.forEach(({ key, data }) => createTaskElement(key, data));
+        // --- Rendera listorna i önskad ordning ---
 
-        // Subheading and bypassdiod tasks
+        // 1. Rendera PRIO-uppgifter (högst upp)
+        if (prioTasks.length > 0) {
+            const prioHeading = document.createElement('h2');
+            prioHeading.textContent = 'PRIO';
+            listContainer.appendChild(prioHeading);
+            prioTasks.forEach(({ key, data }) => createTaskElement(key, data));
+        }
+
+        // 2. Rendera vanliga uppgifter under egen rubrik
+        if (normalTasks.length > 0) {
+            const normalHeading = document.createElement('h2');
+            normalHeading.textContent = 'SERVICE'; // ÄNDRAD RUBRIK
+            listContainer.appendChild(normalHeading);
+            normalTasks.forEach(({ key, data }) => createTaskElement(key, data));
+        }
+
+        // 3. Rendera Bypassdiod-uppgifter (längst ner)
         if (bypassTasks.length > 0) {
-            const subheading = document.createElement('h2');
-            subheading.textContent = 'Bypassdioder';
-            listContainer.appendChild(subheading);
-
+            const bypassHeading = document.createElement('h2');
+            bypassHeading.textContent = 'PANELER'; // ÄNDRAD RUBRIK
+            listContainer.appendChild(bypassHeading);
             bypassTasks.forEach(({ key, data }) => createTaskElement(key, data));
         }
 
