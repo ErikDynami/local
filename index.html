@@ -68,21 +68,16 @@
         overflow-y: auto;
         min-height: 0;
         padding-right: 15px;
-
-        /* iPhone safe bottom padding */
-        padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    }
-
-    @supports (padding: max(0px)) {
-        #service-list-container {
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-        }
     }
 
     .checklist-item {
-        margin-bottom: 25px;
+        margin-bottom: 10px; /* Minskad marginal */
         display: flex;
         align-items: center;
+    }
+
+    .checklist-item-wrapper { /* Ny container för att hålla knapp och text */
+        margin-bottom: 25px;
     }
 
     .checklist-item input[type="checkbox"] {
@@ -94,13 +89,14 @@
         padding-left: 45px;
         cursor: pointer;
         font-size: 20px;
+        line-height: 1.4;
     }
 
     .checklist-item label:before {
         content: '';
         position: absolute;
         left: 0;
-        top: 0;
+        top: 4px;
         width: 28px;
         height: 28px;
         border: 3px solid #ff8c00;
@@ -112,12 +108,28 @@
         content: '';
         position: absolute;
         left: 10px;
-        top: 5px;
+        top: 9px;
         width: 8px;
         height: 16px;
         border: solid #e65100;
         border-width: 0 4px 4px 0;
         transform: rotate(45deg);
+    }
+
+    .pdf-button {
+        margin-left: 45px;
+        margin-top: 10px;
+        padding: 8px 15px;
+        font-size: 16px;
+        background-color: #0078D4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .pdf-button:hover {
+        background-color: #005a9e;
     }
 
     #clock {
@@ -169,17 +181,6 @@
         h1 { font-size: 36px; }
         .checklist-item label { font-size: 18px; }
     }
-
-    @media (min-width: 1800px) {
-        h1 { font-size: 64px; }
-        #service-list-container { padding-right: 25px; }
-        .checklist-item { margin-bottom: 30px; }
-        .checklist-item label { font-size: 28px; padding-left: 55px; }
-        .checklist-item label:before { width: 36px; height: 36px; border-width: 4px; }
-        .checklist-item input[type="checkbox"]:checked + label:after { left: 13px; top: 7px; width: 10px; height: 20px; border-width: 0 5px 5px 0; }
-        #clock { font-size: 120px; }
-        #date { font-size: 48px; }
-    }
 </style>
 </head>
 <body>  
@@ -217,6 +218,7 @@ updateTime();
 const firebaseConfig = {
   apiKey: "AIzaSyDrkXax4XtQdC_kGIVN1OgleLKIunOrIcM",
   authDomain: "erikdynami.firebaseapp.com",
+  databaseURL: "https://erikdynami-default-rtdb.firebaseio.com",
   projectId: "erikdynami",
   storageBucket: "erikdynami.firebasestorage.app",
   messagingSenderId: "1014648797947",
@@ -233,17 +235,12 @@ tasksRef.on('value', (snapshot) => {
     listContainer.innerHTML = '';
 
     if (tasks) {
-        // Skapa listor för varje kategori
-        const prioTasks = [];
-        const bypassTasks = [];
-        const normalTasks = [];
+        const prioTasks = [], bypassTasks = [], normalTasks = [];
 
-        // Sortera uppgifterna i rätt lista
         Object.keys(tasks).forEach(key => {
             const taskData = tasks[key];
-            if (taskData.text) { // Säkerställer att texten finns
+            if (taskData.text) {
                 const lowerCaseText = taskData.text.toLowerCase();
-                
                 if (lowerCaseText.includes('prio')) {
                     prioTasks.push({ key, data: taskData });
                 } else if (lowerCaseText.includes('bypassdiod')) {
@@ -254,40 +251,30 @@ tasksRef.on('value', (snapshot) => {
             }
         });
 
-        // --- Rendera listorna i önskad ordning ---
+        const renderSection = (title, taskArray) => {
+            if (taskArray.length > 0) {
+                const heading = document.createElement('h2');
+                heading.textContent = title;
+                listContainer.appendChild(heading);
+                taskArray.forEach(({ key, data }) => createTaskElement(key, data));
+            }
+        };
 
-        // 1. Rendera PRIO-uppgifter (högst upp)
-        if (prioTasks.length > 0) {
-            const prioHeading = document.createElement('h2');
-            prioHeading.textContent = 'PRIO';
-            listContainer.appendChild(prioHeading);
-            prioTasks.forEach(({ key, data }) => createTaskElement(key, data));
-        }
-
-        // 2. Rendera vanliga uppgifter under egen rubrik
-        if (normalTasks.length > 0) {
-            const normalHeading = document.createElement('h2');
-            normalHeading.textContent = 'SERVICE'; // ÄNDRAD RUBRIK
-            listContainer.appendChild(normalHeading);
-            normalTasks.forEach(({ key, data }) => createTaskElement(key, data));
-        }
-
-        // 3. Rendera Bypassdiod-uppgifter (längst ner)
-        if (bypassTasks.length > 0) {
-            const bypassHeading = document.createElement('h2');
-            bypassHeading.textContent = 'PANELER'; // ÄNDRAD RUBRIK
-            listContainer.appendChild(bypassHeading);
-            bypassTasks.forEach(({ key, data }) => createTaskElement(key, data));
-        }
+        renderSection('PRIO', prioTasks);
+        renderSection('SERVICE', normalTasks);
+        renderSection('PANELER', bypassTasks);
 
     } else {
         listContainer.innerHTML = '<p>Inga uppgifter att visa.</p>';
     }
-
-    setTimeout(adjustFontSize, 0);
 });
 
 function createTaskElement(key, taskData) {
+    // En container för hela objektet (text + knapp)
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.className = 'checklist-item-wrapper';
+
+    // Original-div för checkbox och text
     const itemDiv = document.createElement('div');
     itemDiv.className = 'checklist-item';
     
@@ -302,13 +289,9 @@ function createTaskElement(key, taskData) {
 
     checkbox.addEventListener('change', (event) => {
         const isNowChecked = event.target.checked;
-        let confirmationMessage;
-
-        if (isNowChecked) {
-            confirmationMessage = `Är du säker på att du vill markera "${taskData.text}" som klar?`;
-        } else {
-            confirmationMessage = `Är du säker på att du vill avmarkera "${taskData.text}"?`;
-        }
+        const confirmationMessage = isNowChecked
+            ? `Är du säker på att du vill markera "${taskData.text}" som klar?`
+            : `Är du säker på att du vill avmarkera "${taskData.text}"?`;
 
         if (confirm(confirmationMessage)) {
             database.ref('tasks/' + key).update({ completed: isNowChecked });
@@ -319,33 +302,23 @@ function createTaskElement(key, taskData) {
 
     itemDiv.appendChild(checkbox);
     itemDiv.appendChild(label);
-    listContainer.appendChild(itemDiv);
+    wrapperDiv.appendChild(itemDiv); // Lägg till itemDiv i vår nya wrapper
+
+    // Lägg till "Visa PDF"-knapp om en länk finns
+    if (taskData.pdf_url) {
+        const pdfButton = document.createElement('button');
+        pdfButton.textContent = 'Visa PDF';
+        pdfButton.className = 'pdf-button';
+
+        pdfButton.onclick = () => {
+            window.open(taskData.pdf_url, '_blank');
+        };
+        
+        wrapperDiv.appendChild(pdfButton); // Lägg till knappen i wrappern
+    }
+
+    listContainer.appendChild(wrapperDiv); // Lägg till hela wrappern i listan
 }
-
-function adjustFontSize() {
-    if (window.innerWidth <= 768) return;
-
-    const labels = listContainer.querySelectorAll('.checklist-item label');
-    if (labels.length === 0) return;
-
-    labels.forEach(label => { label.style.fontSize = ''; });
-    let minFontSize = 100;
-    labels.forEach(label => {
-        const style = window.getComputedStyle(label, null).getPropertyValue('font-size');
-        const fontSize = parseFloat(style);
-        if (fontSize < minFontSize) minFontSize = fontSize;
-    });
-
-    const maxHeight = listContainer.clientHeight / labels.length;
-    labels.forEach(label => {
-        let fontSize = minFontSize;
-        while (label.scrollHeight > maxHeight && fontSize > 10) {
-            fontSize -= 1;
-            label.style.fontSize = fontSize + 'px';
-        }
-    });
-}
-window.addEventListener('resize', adjustFontSize);
 </script>
 </body>
 </html>
