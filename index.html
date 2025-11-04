@@ -350,7 +350,6 @@ function createTaskElement(key, taskData) {
     const timeEntryContainer = document.createElement('div');
     timeEntryContainer.className = 'time-entry-container';
     
-    // Funktion för att visa sparat-indikatorn
     const showSavedIndicator = (element) => {
         element.classList.add('saved-indicator');
         setTimeout(() => {
@@ -366,7 +365,7 @@ function createTaskElement(key, taskData) {
     const startTimeInput = document.createElement('input');
     startTimeInput.type = 'time';
     startTimeInput.value = taskData.startTime || '';
-    startTimeInput.addEventListener('change', () => {
+    startTimeInput.addEventListener('blur', () => { // Byt till 'blur'
         database.ref('tasks/' + key).update({ startTime: startTimeInput.value })
             .then(() => showSavedIndicator(startTimeInput));
     });
@@ -381,7 +380,7 @@ function createTaskElement(key, taskData) {
     const endTimeInput = document.createElement('input');
     endTimeInput.type = 'time';
     endTimeInput.value = taskData.endTime || '';
-    endTimeInput.addEventListener('change', () => {
+    endTimeInput.addEventListener('blur', () => { // Byt till 'blur'
         database.ref('tasks/' + key).update({ endTime: endTimeInput.value })
             .then(() => showSavedIndicator(endTimeInput));
     });
@@ -404,10 +403,12 @@ function createTaskElement(key, taskData) {
     
     timeEntryContainer.appendChild(startRow);
     timeEntryContainer.appendChild(endRow);
-    timeEntryContainer.appendChild(buttonRow);
+    if(buttonRow.hasChildNodes()){ // Lägg bara till knappraden om den har knappar
+        timeEntryContainer.appendChild(buttonRow);
+    }
     wrapperDiv.appendChild(timeEntryContainer);
     listContainer.appendChild(wrapperDiv);
 }
 </script>
 </body>
-</html>
+</html>```
