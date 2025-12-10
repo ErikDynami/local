@@ -138,20 +138,21 @@
         font-weight: bold;
         font-size: 16px;
         flex-shrink: 0;
-        width: 60px;
+        width: 70px; /* Lite bredare för att "Total tid" ska få plats */
     }
     
-    .time-entry-container input[type="time"] {
+    /* Uppdaterad CSS för att hantera text-input istället för time-input */
+    .time-entry-container input[type="text"] {
         padding: 8px;
         border: 1px solid #ccc;
         border-radius: 5px;
         font-size: 16px;
-        width: 120px;
-        transition: border-color 0.3s, box-shadow 0.3s; /* Mjuk övergång för indikatorn */
+        width: 140px;
+        transition: border-color 0.3s, box-shadow 0.3s; 
     }
 
     .saved-indicator {
-        border-color: #28a745;
+        border-color: #28a745 !important;
         box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
     }
 
@@ -357,36 +358,29 @@ function createTaskElement(key, taskData) {
         }, 1500);
     };
 
-    // Rad för starttid
-    const startRow = document.createElement('div');
-    startRow.className = 'time-input-row';
-    const startLabel = document.createElement('label');
-    startLabel.textContent = 'Start:';
-    const startTimeInput = document.createElement('input');
-    startTimeInput.type = 'time';
-    startTimeInput.value = taskData.startTime || '';
-    startTimeInput.addEventListener('blur', () => { // Byt till 'blur'
-        database.ref('tasks/' + key).update({ startTime: startTimeInput.value })
-            .then(() => showSavedIndicator(startTimeInput));
-    });
-    startRow.appendChild(startLabel);
-    startRow.appendChild(startTimeInput);
-
-    // Rad för sluttid
-    const endRow = document.createElement('div');
-    endRow.className = 'time-input-row';
-    const endLabel = document.createElement('label');
-    endLabel.textContent = 'Slut:';
-    const endTimeInput = document.createElement('input');
-    endTimeInput.type = 'time';
-    endTimeInput.value = taskData.endTime || '';
-    endTimeInput.addEventListener('blur', () => { // Byt till 'blur'
-        database.ref('tasks/' + key).update({ endTime: endTimeInput.value })
-            .then(() => showSavedIndicator(endTimeInput));
-    });
-    endRow.appendChild(endLabel);
-    endRow.appendChild(endTimeInput);
+    // --- HÄR ÄR ÄNDRINGEN ---
+    // Istället för Start/Slut, skapar vi en rad för "Total tid"
+    const totalTimeRow = document.createElement('div');
+    totalTimeRow.className = 'time-input-row';
     
+    const timeLabel = document.createElement('label');
+    timeLabel.textContent = 'Total tid:';
+    
+    const timeInput = document.createElement('input');
+    timeInput.type = 'text'; // Textfält så man kan skriva "2h" etc.
+    timeInput.placeholder = 'Ange tid...';
+    timeInput.value = taskData.total_time || ''; // Hämtar från databasen
+    
+    // Spara när man klickar utanför fältet (blur)
+    timeInput.addEventListener('blur', () => {
+        database.ref('tasks/' + key).update({ total_time: timeInput.value })
+            .then(() => showSavedIndicator(timeInput));
+    });
+
+    totalTimeRow.appendChild(timeLabel);
+    totalTimeRow.appendChild(timeInput);
+    // -------------------------
+
     // Rad för knappar
     const buttonRow = document.createElement('div');
     buttonRow.className = 'button-row';
@@ -401,9 +395,10 @@ function createTaskElement(key, taskData) {
         buttonRow.appendChild(pdfButton);
     }
     
-    timeEntryContainer.appendChild(startRow);
-    timeEntryContainer.appendChild(endRow);
-    if(buttonRow.hasChildNodes()){ // Lägg bara till knappraden om den har knappar
+    // Lägg till tidsraden istället för start/slut
+    timeEntryContainer.appendChild(totalTimeRow);
+    
+    if(buttonRow.hasChildNodes()){ 
         timeEntryContainer.appendChild(buttonRow);
     }
     wrapperDiv.appendChild(timeEntryContainer);
@@ -411,4 +406,4 @@ function createTaskElement(key, taskData) {
 }
 </script>
 </body>
-</html>```
+</html>
