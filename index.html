@@ -138,10 +138,9 @@
         font-weight: bold;
         font-size: 16px;
         flex-shrink: 0;
-        width: 70px; /* Lite bredare för att "Total tid" ska få plats */
+        width: 70px;
     }
     
-    /* Uppdaterad CSS för att hantera text-input istället för time-input */
     .time-entry-container input[type="text"] {
         padding: 8px;
         border: 1px solid #ccc;
@@ -280,7 +279,8 @@ tasksRef.on('value', (snapshot) => {
     listContainer.innerHTML = '';
 
     if (tasks) {
-        const prioTasks = [], bypassTasks = [], normalTasks = [];
+        // Uppdaterat array-namnet för tydlighet
+        const prioTasks = [], elektrikerTasks = [], normalTasks = [];
 
         Object.keys(tasks).forEach(key => {
             const taskData = tasks[key];
@@ -288,8 +288,8 @@ tasksRef.on('value', (snapshot) => {
                 const lowerCaseText = taskData.text.toLowerCase();
                 if (lowerCaseText.includes('prio')) {
                     prioTasks.push({ key, data: taskData });
-                } else if (lowerCaseText.includes('bypassdiod')) {
-                    bypassTasks.push({ key, data: taskData });
+                } else if (lowerCaseText.includes('elektriker')) { // Leta efter ordet 'elektriker'
+                    elektrikerTasks.push({ key, data: taskData });
                 } else {
                     normalTasks.push({ key, data: taskData });
                 }
@@ -307,7 +307,7 @@ tasksRef.on('value', (snapshot) => {
 
         renderSection('PRIO', prioTasks);
         renderSection('SERVICE', normalTasks);
-        renderSection('PANELER', bypassTasks);
+        renderSection('ELEKTRIKER', elektrikerTasks); // Rubrik 'ELEKTRIKER'
 
     } else {
         listContainer.innerHTML = '<p>Inga uppgifter att visa.</p>';
@@ -358,8 +358,6 @@ function createTaskElement(key, taskData) {
         }, 1500);
     };
 
-    // --- HÄR ÄR ÄNDRINGEN ---
-    // Istället för Start/Slut, skapar vi en rad för "Total tid"
     const totalTimeRow = document.createElement('div');
     totalTimeRow.className = 'time-input-row';
     
@@ -367,11 +365,10 @@ function createTaskElement(key, taskData) {
     timeLabel.textContent = 'Total tid:';
     
     const timeInput = document.createElement('input');
-    timeInput.type = 'text'; // Textfält så man kan skriva "2h" etc.
+    timeInput.type = 'text';
     timeInput.placeholder = 'Ange tid...';
-    timeInput.value = taskData.total_time || ''; // Hämtar från databasen
+    timeInput.value = taskData.total_time || '';
     
-    // Spara när man klickar utanför fältet (blur)
     timeInput.addEventListener('blur', () => {
         database.ref('tasks/' + key).update({ total_time: timeInput.value })
             .then(() => showSavedIndicator(timeInput));
@@ -379,9 +376,7 @@ function createTaskElement(key, taskData) {
 
     totalTimeRow.appendChild(timeLabel);
     totalTimeRow.appendChild(timeInput);
-    // -------------------------
 
-    // Rad för knappar
     const buttonRow = document.createElement('div');
     buttonRow.className = 'button-row';
 
@@ -395,7 +390,6 @@ function createTaskElement(key, taskData) {
         buttonRow.appendChild(pdfButton);
     }
     
-    // Lägg till tidsraden istället för start/slut
     timeEntryContainer.appendChild(totalTimeRow);
     
     if(buttonRow.hasChildNodes()){ 
