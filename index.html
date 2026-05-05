@@ -51,9 +51,19 @@
         font-size: 48px;
         color: #e65100;
         margin-top: 0;
-        margin-bottom: 20px;
+        margin-bottom: 10px; /* Minskad marginal för att föra instruktionstexten närmare */
         text-align: center;
         flex-shrink: 0;
+    }
+
+    /* Ny klass för instruktionstexten under rubriken */
+    .info-text {
+        font-size: 16px;
+        color: #555;
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 25px;
+        font-style: italic;
     }
 
     h2 {
@@ -222,6 +232,7 @@
             -webkit-overflow-scrolling: touch;
         }
         h1 { font-size: 36px; }
+        .info-text { font-size: 14px; margin-bottom: 15px; } /* Anpassning för mobiler */
         .checklist-item label { font-size: 18px; }
     }
 </style>
@@ -230,6 +241,8 @@
 <div class="container">
     <div class="left-panel">
         <h1>Servicelista</h1>
+        <!-- Här är den nya instruktionstexten -->
+        <p class="info-text">Efter all service ska ett faktureringsunderlag lämnas in till kontoret</p>
         <div id="service-list-container"></div>
     </div>
     <div class="right-panel">
@@ -279,7 +292,6 @@ tasksRef.on('value', (snapshot) => {
     listContainer.innerHTML = '';
 
     if (tasks) {
-        // Uppdaterat array-namnet för tydlighet
         const prioTasks = [], elektrikerTasks = [], normalTasks = [];
 
         Object.keys(tasks).forEach(key => {
@@ -288,7 +300,7 @@ tasksRef.on('value', (snapshot) => {
                 const lowerCaseText = taskData.text.toLowerCase();
                 if (lowerCaseText.includes('prio')) {
                     prioTasks.push({ key, data: taskData });
-                } else if (lowerCaseText.includes('elektriker')) { // Leta efter ordet 'elektriker'
+                } else if (lowerCaseText.includes('elektriker')) { 
                     elektrikerTasks.push({ key, data: taskData });
                 } else {
                     normalTasks.push({ key, data: taskData });
@@ -307,7 +319,7 @@ tasksRef.on('value', (snapshot) => {
 
         renderSection('PRIO', prioTasks);
         renderSection('SERVICE', normalTasks);
-        renderSection('ELEKTRIKER', elektrikerTasks); // Rubrik 'ELEKTRIKER'
+        renderSection('ELEKTRIKER', elektrikerTasks); 
 
     } else {
         listContainer.innerHTML = '<p>Inga uppgifter att visa.</p>';
